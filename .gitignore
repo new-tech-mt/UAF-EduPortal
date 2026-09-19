@@ -30,3 +30,5 @@ Thumbs.db
 # UAF scraper debug files
 backend/uaf-result-page.html
 backend/uaf-result-page.png
+.vercel
+.env*

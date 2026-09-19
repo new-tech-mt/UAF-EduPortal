@@ -27,6 +27,10 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`UAF EduPortal Backend running on port ${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`UAF EduPortal Backend running on port ${PORT}`);
+  });
+}
+
+module.exports = app;

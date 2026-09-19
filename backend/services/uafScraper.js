@@ -1,5 +1,5 @@
-const puppeteer = require("puppeteer");
-
+const puppeteer = require("puppeteer-core");
+const chromium = require("@sparticuz/chromium");
 // =========================================
 // UAF CREDIT HOURS
 // =========================================
@@ -260,24 +260,14 @@ async function scrapeUAFResult(registrationNumber) {
     throw new Error("Registration number is required.");
   }
 
-  const browser = await puppeteer.launch({
-    headless: true,
-
-    executablePath:
-      "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-      "--ignore-certificate-errors",
-    ],
-
-    ignoreHTTPSErrors: true,
-
-    timeout: 60000,
-  });
+ const browser = await puppeteer.launch({
+  args: chromium.args,
+  defaultViewport: chromium.defaultViewport,
+  executablePath: await chromium.executablePath(),
+  headless: chromium.headless,
+  ignoreHTTPSErrors: true,
+  timeout: 60000,
+});
 
   const page = await browser.newPage();
 
