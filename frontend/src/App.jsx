@@ -5,7 +5,7 @@ import Home from "./pages/Home/Home";
 import Results from "./pages/Results/Results";
 import Calculator from "./pages/Calculator/Calculator";
 import Help from "./pages/Help/Help";
-import Contact from "./pages/Contact/Contact";
+import Contact from "./pages/contact/Contact";
 
 function Navbar() {
   return (
