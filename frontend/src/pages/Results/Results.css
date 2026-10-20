@@ -1657,3 +1657,97 @@
     height: 25px;
   }
 }
+
+/* Compact mobile subject rows */
+.mobile-subject-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+
+.mobile-subject-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.mobile-subject-name {
+  display: block;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+
+.mobile-subject-code {
+  display: block;
+  margin-top: 3px;
+  color: #718096;
+  font-size: 12px;
+}
+
+.mobile-subject-inline-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 12px;
+  margin-top: 8px;
+  color: #718096;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.mobile-subject-inline-details strong {
+  color: #334155;
+  font-weight: 600;
+}
+
+.mobile-delete-button {
+  display: inline-flex;
+  flex: 0 0 32px;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  padding: 7px;
+  margin: 0;
+  color: #dc2626;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.mobile-delete-button svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.mobile-delete-button:hover {
+  color: #ffffff;
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+@media (max-width: 480px) {
+  .mobile-subject-card {
+    padding: 12px;
+  }
+
+  .mobile-subject-row {
+    gap: 8px;
+  }
+
+  .mobile-subject-inline-details {
+    gap: 4px 9px;
+    font-size: 10px;
+  }
+
+  .mobile-delete-button {
+    flex-basis: 30px;
+    width: 30px;
+    min-width: 30px;
+    height: 30px;
+  }
+}

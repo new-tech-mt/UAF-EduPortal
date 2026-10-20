@@ -339,7 +339,6 @@ function Results() {
 
       const data = response.data;
 
-      // Guard against an empty response being treated as a valid result.
       if (
         !data ||
         (!Array.isArray(data.semesters) &&
@@ -383,7 +382,7 @@ function Results() {
     }
   };
 
-  // Remove only from the displayed result, never from the original UAF record.
+  // Remove a subject from the displayed result only.
   const handleDeleteSubject = (semesterToUpdate, subjectIndex) => {
     const confirmed = window.confirm(
       "Remove this subject from the displayed result? This will not change the original UAF record."
@@ -444,7 +443,16 @@ function Results() {
     });
   };
 
-  // Generate and download the PDF directly.
+  // =========================================
+  // DOWNLOAD PDF
+  // =========================================
+
+  const fullRegistration =
+    result?.registration ||
+    (session && registrationNumber
+      ? `${session}-AG-${registrationNumber}`
+      : "N/A");
+
   const handleDownloadPDF = () => {
     if (!result || downloadingPdf) return;
 
@@ -462,8 +470,9 @@ function Results() {
       const pageHeight = pdf.internal.pageSize.getHeight();
 
       const studentName = result.student?.name || "N/A";
-      const registration = fullRegistration || "N/A";
+      const registration = fullRegistration;
       const currentSummary = result.summary || {};
+
       const currentSemesters = [...(result.semesters || [])].sort((a, b) => {
         const aName = a.semester || a.semesterName || a.name || "";
         const bName = b.semester || b.semesterName || b.name || "";
@@ -588,7 +597,11 @@ function Results() {
 
       pdf.setFontSize(8);
       pdf.setTextColor(100, 116, 139);
-      pdf.text(`Generated on ${new Date().toLocaleDateString("en-GB")}`, 14, y + 14);
+      pdf.text(
+        `Generated on ${new Date().toLocaleDateString("en-GB")}`,
+        14,
+        y + 14
+      );
 
       addPdfFooter(pdf);
 
@@ -615,12 +628,6 @@ function Results() {
     const bName = b.semester || b.semesterName || b.name || "";
     return getSemesterOrder(aName) - getSemesterOrder(bName);
   });
-
-  const fullRegistration =
-    result?.registration ||
-    (session && registrationNumber
-      ? `${session}-AG-${registrationNumber}`
-      : "N/A");
 
   return (
     <section className="page results-page">
@@ -708,11 +715,7 @@ function Results() {
         </div>
 
         {error && (
-          <div
-            className="result-error"
-            role="alert"
-            aria-live="assertive"
-          >
+          <div className="result-error" role="alert" aria-live="assertive">
             <span aria-hidden="true">!</span>
             <div>
               <strong className="result-error-title">
@@ -983,50 +986,72 @@ function Results() {
                           </table>
                         </div>
 
+                        {/* Compact mobile subject rows */}
                         <div className="mobile-subject-list">
                           {semesterSubjects.map((subject, subjectIndex) => (
                             <article
                               className="mobile-subject-card"
                               key={`mobile-${subject.code}-${subject.name}-${subjectIndex}`}
                             >
-                              <div className="mobile-subject-heading">
-                                <div>
-                                  <strong>{subject.name || "N/A"}</strong>
-                                  <span>{subject.code || "N/A"}</span>
-                                </div>
-                                <span className="grade-badge">
-                                  {subject.grade || "N/A"}
-                                </span>
-                              </div>
-
-                              <div className="mobile-subject-details">
-                                <div>
-                                  <span>Credits</span>
-                                  <strong>
-                                    {subject.creditHours ?? "N/A"}
+                              <div className="mobile-subject-row">
+                                <div className="mobile-subject-info">
+                                  <strong className="mobile-subject-name">
+                                    {subject.name || "N/A"}
                                   </strong>
-                                </div>
-                                <div>
-                                  <span>Marks</span>
-                                  <strong>{getMarks(subject)}</strong>
-                                </div>
-                                <div>
-                                  <span>Quality points</span>
-                                  <strong>
-                                    {formatNumber(subject.qualityPoints)}
-                                  </strong>
-                                </div>
-                              </div>
 
-                              <button
-                                className="delete-subject-button no-print"
-                                type="button"
-                                onClick={() =>
-                                  handleDeleteSubject(semester, subjectIndex)
-                                }
-                              >
-                                Remove subject
-                              </button>
+                                  <span className="mobile-subject-code">
+                                    {subject.code || "N/A"}
+                                  </span>
+
+                                  <div className="mobile-subject-inline-details">
+                                    <span>
+                                      Credits:{" "}
+                                      <strong>
+                                        {subject.creditHours ?? "N/A"}
+                                      </strong>
+                                    </span>
+                                    <span>
+                                      Marks:{" "}
+                                      <strong>{getMarks(subject)}</strong>
+                                    </span>
+                                    <span>
+                                      Grade:{" "}
+                                      <strong>{subject.grade || "N/A"}</strong>
+                                    </span>
+                                    <span>
+                                      Points:{" "}
+                                      <strong>
+                                        {formatNumber(subject.qualityPoints)}
+                                      </strong>
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <button
+                                  className="delete-subject-button mobile-delete-button no-print"
+                                  type="button"
+                                  onClick={() =>
+                                    handleDeleteSubject(semester, subjectIndex)
+                                  }
+                                  aria-label={`Remove ${subject.name || "subject"}`}
+                                  title="Remove subject"
+                                >
+                                  <svg
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                  >
+                                    <path
+                                      d="M3 6h18M8 6V4h8v2m-11 0 1 14h12l1-14M10 10v6m4-6v6"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="1.8"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
                             </article>
                           ))}
                         </div>
@@ -1084,6 +1109,7 @@ function Results() {
                               className="delete-subject-button"
                               type="button"
                               onClick={() => handleDeleteSubject(null, index)}
+                              aria-label={`Remove ${subject.name || "subject"}`}
                             >
                               Remove
                             </button>
