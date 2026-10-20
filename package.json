@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "vite-plugin-pwa": "^2.0.0"
+  }
+}

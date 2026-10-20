@@ -1,4 +1,4 @@
-import { Routes, Route, NavLink } from "react-router-dom";
+﻿import { Routes, Route, NavLink } from "react-router-dom";
 import "./App.css";
 
 import Home from "./pages/Home/Home";
@@ -6,8 +6,32 @@ import Results from "./pages/Results/Results";
 import Calculator from "./pages/Calculator/Calculator";
 import Help from "./pages/Help/Help";
 import Contact from "./pages/contact/Contact";
+import InstallAppButton from "./components/InstallAppButton";
 
 function Navbar() {
+  const handleShare = async () => {
+    const shareData = {
+      title: "UAF EduPortal",
+      text: "Visit UAF EduPortal to access student academic tools.",
+      url: window.location.origin,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareData.url);
+        window.alert("Website link copied. You can now share it.");
+      } else {
+        window.prompt("Copy this website link:", shareData.url);
+      }
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        window.prompt("Copy this website link:", shareData.url);
+      }
+    }
+  };
+
   return (
     <header className="navbar">
       <div className="nav-container">
@@ -17,26 +41,25 @@ function Navbar() {
         </NavLink>
 
         <nav className="nav-links">
-          <NavLink to="/" end>
-            Home
-          </NavLink>
-
-          <NavLink to="/results">
-            Results
-          </NavLink>
-
-          <NavLink to="/calculator">
-            GPA Calculator
-          </NavLink>
-
-          <NavLink to="/help">
-            Help
-          </NavLink>
-
-          <NavLink to="/contact">
-            Contact
-          </NavLink>
+          <NavLink to="/" end>Home</NavLink>
+          <NavLink to="/results">Results</NavLink>
+          <NavLink to="/calculator">GPA Calculator</NavLink>
+          <NavLink to="/help">Help</NavLink>
+          <NavLink to="/contact">Contact</NavLink>
         </nav>
+
+        <div className="nav-actions">
+          <button
+            className="nav-share-btn"
+            type="button"
+            onClick={handleShare}
+            aria-label="Share UAF EduPortal"
+          >
+            <span aria-hidden="true">↗</span>
+            Share
+          </button>
+          <InstallAppButton />
+        </div>
       </div>
     </header>
   );
@@ -51,8 +74,8 @@ function Footer() {
       </div>
 
       <p>
-  © 2026 UAF EduPortal. All Rights Reserved. | Developed by Muhammad Tayyab | MT TECH
-</p>
+        © 2026 UAF EduPortal. All Rights Reserved. | Developed by Muhammad Tayyab | MT TECH
+      </p>
     </footer>
   );
 }

@@ -451,3 +451,107 @@ tr:last-child td {
     width: 100%;
   }
 }
+
+/* Install app button */
+.install-app-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 15px;
+  border: 0;
+  border-radius: 9px;
+  background: #0b5ed7;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.install-app-btn:hover:not(:disabled) {
+  background: #084db3;
+  transform: translateY(-1px);
+}
+
+.install-app-btn:disabled {
+  background: #e8eef7;
+  color: #526174;
+  cursor: default;
+}
+
+@media (max-width: 850px) {
+  .install-app-btn {
+    margin-top: 2px;
+  }
+}
+
+@media (max-width: 550px) {
+  .install-app-btn {
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+}
+/* Navbar action buttons */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  flex-shrink: 0;
+}
+
+.nav-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 9px 13px;
+  border: 1px solid #d5e3f8;
+  border-radius: 9px;
+  background: #eef5ff;
+  color: #0b5ed7;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.nav-share-btn:hover {
+  background: #dceaff;
+  transform: translateY(-1px);
+}
+
+.nav-share-btn:focus-visible,
+.result-action-button:focus-visible,
+.delete-subject-button:focus-visible {
+  outline: 3px solid rgba(11, 94, 215, 0.28);
+  outline-offset: 2px;
+}
+
+@media (max-width: 850px) {
+  .nav-actions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .nav-actions .install-app-btn {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 550px) {
+  .nav-actions {
+    gap: 8px;
+  }
+
+  .nav-share-btn,
+  .nav-actions .install-app-btn {
+    min-height: 39px;
+    padding: 9px 11px;
+    font-size: 13px;
+  }
+}
