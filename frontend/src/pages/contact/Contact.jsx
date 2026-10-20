@@ -1,7 +1,23 @@
+
 import { useState } from "react";
 import "./Contact.css";
 
-const WHATSAPP_NUMBER = "923284212706";
+const WHATSAPP_NUMBER = "923266337753";
+const TIKTOK_URL = "https://www.tiktok.com/@mt_tech13";
+
+function TikTokIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="25"
+      height="25"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.24V2h-3.55v13.67a2.9 2.9 0 0 1-2.9 2.9 2.9 2.9 0 0 1-2.9-2.9 2.9 2.9 0 0 1 2.9-2.9c.3 0 .6.05.88.14V9.28a6.45 6.45 0 0 0-.88-.06 6.45 6.45 0 1 0 6.45 6.45V8.7a8.36 8.36 0 0 0 4.9 1.58V6.73c-.38 0-.76-.02-1.13-.04Z" />
+    </svg>
+  );
+}
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -35,7 +51,7 @@ function Contact() {
       return;
     }
 
-    const whatsappMessage = `Hello MT TECH,
+    const whatsappMessage = `Hello TAYYAB,
 
 Name: ${formData.name.trim()}
 Issue: ${formData.subject.trim()}
@@ -49,7 +65,7 @@ Sent from UAF EduPortal.`;
       `https://wa.me/${WHATSAPP_NUMBER}?text=` +
       encodeURIComponent(whatsappMessage);
 
-    window.open(whatsappUrl, "_blank");
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
 
     setFormData({
       name: "",
@@ -65,7 +81,8 @@ Sent from UAF EduPortal.`;
       <div className="page-header">
         <h1>Contact Us</h1>
         <p>
-          Found an issue or have feedback? Send us a message on WhatsApp.
+          Found an issue or have feedback? Contact us through WhatsApp
+          or send us a DM on TikTok.
         </p>
       </div>
 
@@ -79,20 +96,42 @@ Sent from UAF EduPortal.`;
 
           <p>
             If you experience a problem with results, GPA calculation, or
-            any other portal feature, send us the details through WhatsApp.
+            any other portal feature, send us the details through WhatsApp
+            or reach out on TikTok.
           </p>
 
           <div className="contact-details">
-           <div>
-  <span>Developer</span>
-  <strong>Muhammad Tayyab | MT TECH</strong>
-</div>
+            <div>
+              <span>Developer</span>
+              <strong>Muhammad Tayyab | MT TECH</strong>
+            </div>
 
             <div>
               <span>Support</span>
               <strong>WhatsApp</strong>
             </div>
           </div>
+
+          <a
+            className="contact-tiktok-link"
+            href={TIKTOK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="DM us on TikTok @mt_tech13"
+          >
+            <span className="contact-tiktok-icon">
+              <TikTokIcon />
+            </span>
+
+            <span className="contact-tiktok-text">
+              <strong>DM us on TikTok</strong>
+              <small>@mt_tech13</small>
+            </span>
+
+            <span className="contact-tiktok-arrow" aria-hidden="true">
+              ↗
+            </span>
+          </a>
         </div>
 
         <div className="contact-form-card">
@@ -146,15 +185,12 @@ Sent from UAF EduPortal.`;
             </div>
 
             {error && (
-              <div className="contact-status error">
+              <div className="contact-status error" role="alert">
                 {error}
               </div>
             )}
 
-            <button
-              type="submit"
-              className="contact-submit"
-            >
+            <button type="submit" className="contact-submit">
               Send Message on WhatsApp
             </button>
           </form>

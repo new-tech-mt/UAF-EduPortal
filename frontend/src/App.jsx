@@ -1,4 +1,6 @@
-﻿import { Routes, Route, NavLink } from "react-router-dom";
+﻿
+import { useState } from "react";
+import { Routes, Route, NavLink } from "react-router-dom";
 import "./App.css";
 
 import Home from "./pages/Home/Home";
@@ -9,6 +11,10 @@ import Contact from "./pages/contact/Contact";
 import InstallAppButton from "./components/InstallAppButton";
 
 function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const closeMenu = () => setMenuOpen(false);
+
   const handleShare = async () => {
     const shareData = {
       title: "UAF EduPortal",
@@ -35,17 +41,34 @@ function Navbar() {
   return (
     <header className="navbar">
       <div className="nav-container">
-        <NavLink to="/" className="logo">
+        <NavLink to="/" className="logo" onClick={closeMenu}>
           <span className="logo-box">UAF</span>
           <span>EduPortal</span>
         </NavLink>
 
-        <nav className="nav-links">
-          <NavLink to="/" end>Home</NavLink>
-          <NavLink to="/results">Results</NavLink>
-          <NavLink to="/calculator">GPA Calculator</NavLink>
-          <NavLink to="/help">Help</NavLink>
-          <NavLink to="/contact">Contact</NavLink>
+        <nav
+          id="mobile-navigation"
+          className={`nav-links ${menuOpen ? "mobile-menu-open" : ""}`}
+        >
+          <NavLink to="/" end onClick={closeMenu}>
+            Home
+          </NavLink>
+
+          <NavLink to="/results" onClick={closeMenu}>
+            Results
+          </NavLink>
+
+          <NavLink to="/calculator" onClick={closeMenu}>
+            GPA Calculator
+          </NavLink>
+
+          <NavLink to="/help" onClick={closeMenu}>
+            Help
+          </NavLink>
+
+          <NavLink to="/contact" onClick={closeMenu}>
+            Contact
+          </NavLink>
         </nav>
 
         <div className="nav-actions">
@@ -54,11 +77,68 @@ function Navbar() {
             type="button"
             onClick={handleShare}
             aria-label="Share UAF EduPortal"
+            title="Share"
           >
-            <span aria-hidden="true">↗</span>
-            Share
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4" />
+            </svg>
+            <span className="nav-action-label">Share</span>
           </button>
-          <InstallAppButton />
+
+          <div className="nav-install-btn" title="Install App">
+            <InstallAppButton />
+          </div>
+
+          <button
+            className="mobile-menu-toggle"
+            type="button"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
+            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+            title={menuOpen ? "Close menu" : "Open menu"}
+          >
+            {menuOpen ? (
+              <svg
+                viewBox="0 0 24 24"
+                width="23"
+                height="23"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <path d="m18 6-12 12M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg
+                viewBox="0 0 24 24"
+                width="23"
+                height="23"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
     </header>

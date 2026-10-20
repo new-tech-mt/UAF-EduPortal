@@ -15,13 +15,10 @@ function getSemesterOrder(name = "") {
   const year = yearMatch ? Number(yearMatch[0]) : 9999;
 
   let season = 9;
-
   if (semester.includes("winter")) season = 1;
   else if (semester.includes("spring")) season = 2;
   else if (semester.includes("summer")) season = 3;
-  else if (semester.includes("fall") || semester.includes("autumn")) {
-    season = 4;
-  }
+  else if (semester.includes("fall") || semester.includes("autumn")) season = 4;
 
   return year * 10 + season;
 }
@@ -42,11 +39,7 @@ function getMarks(subject) {
   ];
 
   for (const value of values) {
-    if (
-      value !== undefined &&
-      value !== null &&
-      String(value).trim() !== ""
-    ) {
+    if (value !== undefined && value !== null && String(value).trim() !== "") {
       return value;
     }
   }
@@ -111,6 +104,29 @@ function normalizeResult(data) {
     subjects,
     summary: calculateSummary(subjects),
   };
+}
+
+// =========================================
+// DELETE ICON
+// =========================================
+
+function DeleteIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="18"
+      height="18"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M3 6h18M8 6V4h8v2m-11 0 1 14h12l1-14M10 10v6m4-6v6" />
+    </svg>
+  );
 }
 
 // =========================================
@@ -222,10 +238,7 @@ function addSubjectPdfTable(pdf, subjects, startY, includeSemester = false) {
       formatNumber(subject.qualityPoints),
     ];
 
-    if (includeSemester) {
-      row.unshift(String(subject.semester || "-"));
-    }
-
+    if (includeSemester) row.unshift(String(subject.semester || "-"));
     return row;
   });
 
@@ -287,6 +300,7 @@ function Results() {
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState(null);
 
   const sessionRef = useRef(null);
   const registrationRef = useRef(null);
@@ -315,6 +329,7 @@ function Results() {
 
     setError("");
     setResult(null);
+    setPendingDelete(null);
 
     if (session.length !== 4) {
       setError("Please enter a valid 4-digit admission year.");
@@ -329,7 +344,6 @@ function Results() {
     }
 
     const registration = `${session}-AG-${registrationNumber}`;
-
     setLoading(true);
 
     try {
@@ -382,20 +396,30 @@ function Results() {
     }
   };
 
-  // Remove a subject from the displayed result only.
+  // Open confirmation modal for the selected subject.
   const handleDeleteSubject = (semesterToUpdate, subjectIndex) => {
-    const confirmed = window.confirm(
-      "Remove this subject from the displayed result? This will not change the original UAF record."
-    );
+    const subject =
+      semesterToUpdate?.subjects?.[subjectIndex] ||
+      result?.subjects?.[subjectIndex];
 
-    if (!confirmed) return;
+    setPendingDelete({
+      semester: semesterToUpdate,
+      subjectIndex,
+      subjectName: subject?.name || "this subject",
+    });
+  };
+
+  // Delete only after confirmation.
+  const confirmDeleteSubject = () => {
+    if (!pendingDelete) return;
+
+    const { semester: semesterToUpdate, subjectIndex } = pendingDelete;
 
     setResult((current) => {
       if (!current) return current;
 
       if (current.semesters?.length && semesterToUpdate) {
         const targetIndex = current.semesters.indexOf(semesterToUpdate);
-
         if (targetIndex === -1) return current;
 
         const semesters = current.semesters.map((semester, index) => {
@@ -441,17 +465,19 @@ function Results() {
         summary: calculateSummary(subjects),
       };
     });
-  };
 
-  // =========================================
-  // DOWNLOAD PDF
-  // =========================================
+    setPendingDelete(null);
+  };
 
   const fullRegistration =
     result?.registration ||
     (session && registrationNumber
       ? `${session}-AG-${registrationNumber}`
       : "N/A");
+
+  // =========================================
+  // DOWNLOAD PDF
+  // =========================================
 
   const handleDownloadPDF = () => {
     if (!result || downloadingPdf) return;
@@ -468,7 +494,6 @@ function Results() {
 
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-
       const studentName = result.student?.name || "N/A";
       const registration = fullRegistration;
       const currentSummary = result.summary || {};
@@ -482,7 +507,6 @@ function Results() {
       addPdfHeader(pdf, "UAF EduPortal", "Student Academic Result Report");
 
       let y = 45;
-
       addPdfSectionTitle(pdf, "Student Information", y);
       y += 10;
 
@@ -631,6 +655,61 @@ function Results() {
 
   return (
     <section className="page results-page">
+      {/* Custom subject deletion confirmation modal */}
+      {pendingDelete && (
+        <div
+          className="delete-modal-overlay no-print"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setPendingDelete(null);
+            }
+          }}
+        >
+          <div
+            className="delete-modal"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-modal-title"
+            aria-describedby="delete-modal-description"
+          >
+            <div className="delete-modal-icon">
+              <DeleteIcon />
+            </div>
+
+            <h2 id="delete-modal-title">Delete Subject?</h2>
+
+            <p id="delete-modal-description">
+              Are you sure you want to delete{" "}
+              <strong>{pendingDelete.subjectName}</strong> from the displayed
+              result?
+            </p>
+
+            <div className="delete-modal-notice">
+              This only changes the result displayed on this page. Your
+              original UAF record will remain unchanged.
+            </div>
+
+            <div className="delete-modal-actions">
+              <button
+                type="button"
+                className="delete-modal-cancel"
+                onClick={() => setPendingDelete(null)}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="delete-modal-confirm"
+                onClick={confirmDeleteSubject}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="results-page-header">
         <div className="results-header-content">
           <span className="results-eyebrow">UAF EDU PORTAL</span>
@@ -757,7 +836,7 @@ function Results() {
         <div className="results-content">
           <div className="results-actions no-print">
             <p>
-              Subject removals affect this displayed result only. The original
+              Subject deletions affect this displayed result only. The original
               UAF record remains unchanged.
             </p>
 
@@ -874,9 +953,7 @@ function Results() {
                   >
                     <div className="semester-result-header">
                       <div className="semester-title">
-                        <div className="semester-number">
-                          {semesterNumber}
-                        </div>
+                        <div className="semester-number">{semesterNumber}</div>
                         <div>
                           <span>SEMESTER {semesterNumber}</span>
                           <h3>{semesterName}</h3>
@@ -951,14 +1028,12 @@ function Results() {
                                       className="delete-subject-button"
                                       type="button"
                                       onClick={() =>
-                                        handleDeleteSubject(
-                                          semester,
-                                          subjectIndex
-                                        )
+                                        handleDeleteSubject(semester, subjectIndex)
                                       }
-                                      aria-label={`Remove ${subject.name || "subject"}`}
+                                      aria-label={`Delete ${subject.name || "subject"}`}
+                                      title="Delete subject"
                                     >
-                                      Remove
+                                      <DeleteIcon />
                                     </button>
                                   </td>
                                 </tr>
@@ -986,7 +1061,6 @@ function Results() {
                           </table>
                         </div>
 
-                        {/* Compact mobile subject rows */}
                         <div className="mobile-subject-list">
                           {semesterSubjects.map((subject, subjectIndex) => (
                             <article
@@ -1011,8 +1085,7 @@ function Results() {
                                       </strong>
                                     </span>
                                     <span>
-                                      Marks:{" "}
-                                      <strong>{getMarks(subject)}</strong>
+                                      Marks: <strong>{getMarks(subject)}</strong>
                                     </span>
                                     <span>
                                       Grade:{" "}
@@ -1033,23 +1106,10 @@ function Results() {
                                   onClick={() =>
                                     handleDeleteSubject(semester, subjectIndex)
                                   }
-                                  aria-label={`Remove ${subject.name || "subject"}`}
-                                  title="Remove subject"
+                                  aria-label={`Delete ${subject.name || "subject"}`}
+                                  title="Delete subject"
                                 >
-                                  <svg
-                                    viewBox="0 0 24 24"
-                                    aria-hidden="true"
-                                    focusable="false"
-                                  >
-                                    <path
-                                      d="M3 6h18M8 6V4h8v2m-11 0 1 14h12l1-14M10 10v6m4-6v6"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      strokeWidth="1.8"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                  </svg>
+                                  <DeleteIcon />
                                 </button>
                               </div>
                             </article>
@@ -1109,9 +1169,10 @@ function Results() {
                               className="delete-subject-button"
                               type="button"
                               onClick={() => handleDeleteSubject(null, index)}
-                              aria-label={`Remove ${subject.name || "subject"}`}
+                              aria-label={`Delete ${subject.name || "subject"}`}
+                              title="Delete subject"
                             >
-                              Remove
+                              <DeleteIcon />
                             </button>
                           </td>
                         </tr>

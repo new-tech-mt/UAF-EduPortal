@@ -1,4 +1,5 @@
-﻿import { useEffect, useState } from "react";
+﻿
+import { useEffect, useState } from "react";
 
 export default function InstallAppButton() {
   const [installPrompt, setInstallPrompt] = useState(null);
@@ -40,11 +41,15 @@ export default function InstallAppButton() {
       return;
     }
 
-    await installPrompt.prompt();
-    const choice = await installPrompt.userChoice;
+    try {
+      await installPrompt.prompt();
+      const choice = await installPrompt.userChoice;
 
-    if (choice.outcome === "accepted") {
-      setInstallPrompt(null);
+      if (choice.outcome === "accepted") {
+        setInstallPrompt(null);
+      }
+    } catch (error) {
+      console.error("App installation failed:", error);
     }
   }
 
@@ -55,9 +60,28 @@ export default function InstallAppButton() {
       onClick={handleInstall}
       disabled={installed}
       title={installed ? "App is already installed" : "Install UAF EduPortal"}
+      aria-label={installed ? "App already installed" : "Install UAF EduPortal"}
     >
-      <span aria-hidden="true">↓</span>{" "}
-      {installed ? "App Installed" : "Install App"}
+      <svg
+        className="install-app-icon"
+        viewBox="0 0 24 24"
+        width="21"
+        height="21"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <path d="m7 10 5 5 5-5" />
+        <path d="M12 15V3" />
+      </svg>
+
+      <span className="install-app-label">
+        {installed ? "App Installed" : "Install App"}
+      </span>
     </button>
   );
 }
